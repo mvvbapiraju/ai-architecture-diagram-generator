@@ -1,4 +1,4 @@
-# Agent Instructions: Azure Architecture Diagram Generation
+# Agent Instructions: Azure Architecture Diagram Generator - Mac OS
 
 ## Overview
 This workspace contains tools to automatically generate Azure architecture diagrams from Infrastructure-as-Code (Terraform, Bicep, ARM templates). The diagrams are created using Python's `diagrams` library, rendered with GraphViz, and converted to editable draw.io format.
@@ -8,9 +8,8 @@ This workspace contains tools to automatically generate Azure architecture diagr
 ## Environment Setup
 
 ### Python Environment
-- **Location**: `C:\Shelly\Youtube\Azure AI\Arch-diag\Arch_Diagrams\venv`
 - **Python Version**: 3.13.7
-- **Activation**: `.\venv\Scripts\Activate.ps1` (PowerShell)
+- **Location**: `/usr/bin/env python`
 - **Installation**: See setup instructions below (pygraphviz requires special handling)
 
 ### Installed Packages (Exact Versions)
@@ -25,29 +24,23 @@ svg.path==7.0
 
 ### Initial Setup from Scratch
 ```powershell
-# 1. Create virtual environment
-cd "C:\Shelly\Youtube\Azure AI\Arch-diag\Arch_Diagrams"
-python -m venv venv
-.\venv\Scripts\Activate.ps1
+# 1. Make sure python executable is available in PATH and homebrew is installed.
 
 # 2. Install pygraphviz with GraphViz paths (requires MSVC Build Tools)
-$env:GRAPHVIZ_DIR = "C:\Program Files\Graphviz"
-pip install --config-settings="--global-option=build_ext" --config-settings="--global-option=-IC:\Program Files\Graphviz\include" --config-settings="--global-option=-LC:\Program Files\Graphviz\lib" pygraphviz
+     Install Graphviz using Homebrew:
+     brew install graphviz
+
+     Try installing pygraphviz with pip. If it still fails, you may need to explicitly provide the paths to the Graphviz libraries
+     export CFLAGS="-I$(brew --prefix graphviz)/include"
+     export LDFLAGS="-L$(brew --prefix graphviz)/lib"
+     pip install pygraphviz
 
 # 3. Install remaining packages
-pip install diagrams graphviz graphviz2drawio
+     pip install diagrams graphviz graphviz2drawio
 
 # OR use requirements.txt (but pygraphviz needs special install first)
 # pip install -r requirements.txt
 ```
-
-### GraphViz Installation
-- **Location**: `C:\Program Files\Graphviz\bin`
-- **Version**: 14.0.2
-- **Critical**: Must add to PATH before running diagram scripts
-  ```powershell
-  $env:PATH += ";C:\Program Files\Graphviz\bin"
-  ```
 
 ### VS Code Extensions
 - **Draw.io**: `hediet.vscode-drawio` - For viewing/editing .drawio files
@@ -59,7 +52,7 @@ pip install diagrams graphviz graphviz2drawio
 
 ```
 Arch_Diagrams/
-├── venv/                           # Python virtual environment
+├── venv/                           # Python virtual environment (for non-pyenv based setup)
 ├── requirements.txt                # Python package dependencies
 ├── diagrams/                       # Output directory for all generated diagrams
 │   ├── *.png                       # PNG image outputs
@@ -105,9 +98,7 @@ External Repositories:
 
 #### Step 2: Run with GraphViz in PATH
 ```powershell
-cd "C:\Shelly\Youtube\Azure AI\Arch-diag\my_azure_diagrams"
-.\venv\Scripts\Activate.ps1
-$env:PATH += ";C:\Program Files\Graphviz\bin"
+cd "$(pwd)/architecture-diagram-generator"
 python <script_name>.py
 ```
 
@@ -266,11 +257,22 @@ print([x for x in dir(network) if not x.startswith('_')])
 ## Troubleshooting
 
 ### GraphViz Not Found
-**Error**: `ExecutableNotFound: failed to execute WindowsPath('dot')`
+**Error**:
+```
+ERROR: Failed building wheel for pygraphviz
+Failed to build pygraphviz                                                   
+error: failed-wheel-build-for-install
 
-**Solution**: Add GraphViz to PATH before running:
+× Failed to build installable wheels for some pyproject.toml based projects
+╰─> pygraphviz
+```
+
+**Solution**: Install Graphviz using Homebrew and explicitly provide the paths to the Graphviz libraries before running:
 ```powershell
-$env:PATH += ";C:\Program Files\Graphviz\bin"
+brew install graphviz
+export CFLAGS="-I$(brew --prefix graphviz)/include"
+export LDFLAGS="-L$(brew --prefix graphviz)/lib"
+pip install pygraphviz
 ```
 
 ### Import Errors
